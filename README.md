@@ -4,12 +4,9 @@ A responsive weather website where you can search any city and explore its curre
 
 Built with plain **HTML, CSS and JavaScript** and the free [Open-Meteo](https://open-meteo.com/) API. It needs no backend and no API key.
 
-<img width="1322" height="725" alt="image" src="https://github.com/user-attachments/assets/c41f9d10-55b7-43d1-9d6a-b0780e1cfb41" />
-<img width="1518" height="729" alt="image" src="https://github.com/user-attachments/assets/72674080-6de8-430e-9870-e108e6c7eb3e" />
+<!-- Add a screenshot here, e.g. ![SkyCast screenshot](screenshot.png) -->
 
-
-
-**Live demo:** https://varshag-28.github.io/weather-app/
+**Live demo:** _add your GitHub Pages link here after you publish it_
 
 ## Features
 
@@ -20,6 +17,9 @@ Built with plain **HTML, CSS and JavaScript** and the free [Open-Meteo](https://
 - **°C / °F toggle:** switches units for temperature and wind speed
 - **My location:** one click to get the weather where you are (browser permission needed)
 - **Weather-based themes:** the background changes for clear, cloudy, fog, rain, snow, storm and night
+- **Cute animated weather mascots:** a smiling sun, a sleepy moon, and cloud, rain, snow, fog and storm characters, plus falling rain, drifting clouds, snowflakes, twinkling stars and lightning flashes behind the page
+- **Umbrella buddy:** when it is raining, or rain is likely in the next 12 hours, a swaying umbrella appears with a reminder to take it (there are also tips for snow and strong sun)
+- **Motion-friendly:** animations are switched off for people who have "reduce motion" turned on in their device settings
 - **Recent searches:** your last five cities are saved in the browser for quick access
 - **Responsive design:** works on desktop, tablet and phone
 - **Error handling:** clear messages if a city is not found or the connection fails
@@ -29,8 +29,8 @@ Built with plain **HTML, CSS and JavaScript** and the free [Open-Meteo](https://
 | Part | Tool |
 |------|------|
 | Structure | HTML5 |
-| Styling | CSS3 (Grid, Flexbox, gradients, glass effect, media queries) |
-| Logic | Vanilla JavaScript (Fetch API, async/await, DOM, SVG) |
+| Styling | CSS3 (Grid, Flexbox, gradients, glass effect, keyframe animations, media queries) |
+| Logic | Vanilla JavaScript (Fetch API, async/await, DOM, inline SVG) |
 | Data | Open-Meteo Geocoding API and Forecast API |
 | Storage | `localStorage` (recent searches) |
 
@@ -62,12 +62,18 @@ No installation is needed.
    ```
 2. Open `index.html` in your browser. An internet connection is required for the weather data.
 
+## Publish it with GitHub Pages
+
+1. Push the files to a GitHub repository.
+2. Go to **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, and click **Save**.
+4. After a minute, your site is live at `https://<your-username>.github.io/<repository-name>/`.
+
 ## Possible improvements
 
 - Air quality and pollen information
 - Saved favourite cities
 - Weather alerts and a rain radar map
-- Animated weather backgrounds
 - A Python (Flask) version that fetches the data on the server
 
 ## Credits
