@@ -62,13 +62,6 @@ No installation is needed.
    ```
 2. Open `index.html` in your browser. An internet connection is required for the weather data.
 
-## Publish it with GitHub Pages
-
-1. Push the files to a GitHub repository.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, and click **Save**.
-4. After a minute, your site is live at `https://<your-username>.github.io/<repository-name>/`.
-
 ## Possible improvements
 
 - Air quality and pollen information
