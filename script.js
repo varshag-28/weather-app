@@ -10,7 +10,7 @@ const state = {
     selectedDay: null     // null = next 24 hours, otherwise day index 0-6
 };
 
-
+// ---------- weather codes (WMO) ----------
 const WMO = {
     0: ["Clear sky", "☀️", "🌙"], 1: ["Mainly clear", "🌤️", "🌙"], 2: ["Partly cloudy", "⛅", "☁️"], 3: ["Overcast", "☁️"],
     45: ["Fog", "🌫️"], 48: ["Rime fog", "🌫️"],
@@ -39,7 +39,7 @@ function themeFor(code, isDay) {
     return "clear";
 }
 
-
+// ---------- small helpers ----------
 function unitSymbols() {
     return state.unit === "celsius" ? { temp: "°C", wind: "km/h" } : { temp: "°F", wind: "mph" };
 }
@@ -86,6 +86,7 @@ function el(tag, className, text) {
     return n;
 }
 
+// ---------- recent searches (localStorage may be unavailable, so always guarded) ----------
 function loadRecents() {
     try { return JSON.parse(localStorage.getItem("skycast.recents") || "[]"); } catch (e) { return []; }
 }
@@ -111,7 +112,7 @@ function renderRecents() {
     });
 }
 
-
+// ---------- data fetching ----------
 async function searchCities(query) {
     const url = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(query) +
                 "&count=5&language=en&format=json";
@@ -166,6 +167,8 @@ async function refresh() {
 // ---------- rendering ----------
 function render() {
     renderHero();
+    renderFx();
+    renderBuddy();
     renderDetails();
     renderChart();
     renderDaily();
@@ -179,7 +182,7 @@ function renderHero() {
     $("placeName").textContent = state.place.name + (state.place.region ? ", " + state.place.region : "");
     $("localTime").textContent = "Local time: " + fmtClock(c.time) + " · " +
         new Date(c.time.slice(0, 10) + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
-    $("heroIcon").textContent = info.icon;
+    $("heroIcon").innerHTML = mascotSVG(themeFor(c.weather_code, c.is_day === 1));
     $("heroTemp").textContent = Math.round(c.temperature_2m);
     $("heroUnit").textContent = u.temp;
     $("heroDesc").textContent = info.text;
@@ -223,6 +226,197 @@ function renderDaily() {
         });
         box.appendChild(btn);
     });
+}
+
+
+// =====================================================
+// Cute weather animations (all markup below is static, written by me – no user text inside)
+// =====================================================
+function faceSVG(x, y, mouth) {
+    const m = mouth === "o"
+        ? '<ellipse cx="0" cy="15" rx="5" ry="6" fill="#7a3b3b"/>'
+        : '<path d="M-9 10 Q0 21 9 10" stroke="#3b2f2f" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    return '<g transform="translate(' + x + ' ' + y + ')">' +
+        '<ellipse class="eye" cx="-17" cy="0" rx="5" ry="6.5" fill="#3b2f2f"/>' +
+        '<ellipse class="eye" cx="17" cy="0" rx="5" ry="6.5" fill="#3b2f2f"/>' +
+        '<circle cx="-28" cy="12" r="6" fill="#ff8fa3" opacity="0.7"/>' +
+        '<circle cx="28" cy="12" r="6" fill="#ff8fa3" opacity="0.7"/>' + m + '</g>';
+}
+
+function cloudShape(fill, dy) {
+    return '<g transform="translate(0 ' + dy + ')" fill="' + fill + '">' +
+        '<circle cx="70" cy="110" r="32"/><circle cx="106" cy="84" r="42"/><circle cx="142" cy="110" r="30"/>' +
+        '<rect x="40" y="104" width="130" height="38" rx="19"/></g>';
+}
+
+function mascotSVG(theme) {
+    const open = '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">';
+    if (theme === "clear") {
+        let rays = "";
+        for (let i = 0; i < 12; i++) rays += '<rect x="96" y="8" width="8" height="26" rx="4" fill="#ffd43b" transform="rotate(' + (i * 30) + ' 100 100)"/>';
+        return open + '<defs><radialGradient id="sunG" cx="40%" cy="35%"><stop offset="0" stop-color="#fff7a8"/><stop offset="1" stop-color="#ffbe0b"/></radialGradient></defs>' +
+            '<g class="rays">' + rays + '</g><circle cx="100" cy="100" r="50" fill="url(#sunG)"/>' + faceSVG(100, 98) + '</svg>';
+    }
+    if (theme === "night") {
+        return open + '<circle cx="100" cy="100" r="52" fill="#fff3c4"/><circle cx="130" cy="72" r="9" fill="#f1e2a3"/><circle cx="72" cy="130" r="7" fill="#f1e2a3"/>' +
+            '<g transform="translate(100 98)"><path d="M-23 0 Q-17 7 -11 0" stroke="#3b2f2f" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+            '<path d="M11 0 Q17 7 23 0" stroke="#3b2f2f" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+            '<circle cx="-28" cy="12" r="6" fill="#ff8fa3" opacity="0.7"/><circle cx="28" cy="12" r="6" fill="#ff8fa3" opacity="0.7"/>' +
+            '<path d="M-8 12 Q0 20 8 12" stroke="#3b2f2f" stroke-width="3" fill="none" stroke-linecap="round"/></g>' +
+            '<text class="zzz" x="150" y="48" font-size="22" fill="#fff" font-weight="700">z</text>' +
+            '<text class="zzz" x="166" y="30" font-size="15" fill="#fff" font-weight="700" style="animation-delay:.6s">z</text></svg>';
+    }
+    if (theme === "cloudy") {
+        return open + cloudShape("#ffffff", 0) + faceSVG(106, 112) + '</svg>';
+    }
+    if (theme === "fog") {
+        return open + cloudShape("#eef2f5", -14) + faceSVG(106, 98) +
+            '<rect class="mist" x="46" y="150" width="108" height="9" rx="4.5" fill="#fff" opacity="0.85"/>' +
+            '<rect class="mist" x="62" y="168" width="84" height="9" rx="4.5" fill="#fff" opacity="0.7" style="animation-delay:1s"/></svg>';
+    }
+    if (theme === "rain") {
+        let drops = "";
+        [70, 100, 130, 155].forEach((x, i) => {
+            drops += '<g transform="translate(' + x + ' 140)"><g class="drop-g" style="animation-delay:' + (i * 0.35) + 's">' +
+                '<path d="M0 0 Q7 11 0 18 Q-7 11 0 0" fill="#7cc4ff"/></g></g>';
+        });
+        return open + cloudShape("#d5dde8", -26) + faceSVG(106, 88) + drops + '</svg>';
+    }
+    if (theme === "snow") {
+        let flakes = "";
+        [70, 105, 140].forEach((x, i) => {
+            flakes += '<g transform="translate(' + x + ' 138)"><g class="flake-g" style="animation-delay:' + (i * 0.6) + 's">' +
+                '<circle r="6" fill="#fff"/><circle r="2" fill="#bfe3ff"/></g></g>';
+        });
+        return open + cloudShape("#e6eef7", -26) + faceSVG(106, 88) + flakes + '</svg>';
+    }
+    // storm
+    return open + cloudShape("#8493a5", -26) + faceSVG(106, 88, "o") +
+        '<polygon class="bolt" points="108,128 88,162 104,162 94,192 128,150 110,150 120,128" fill="#ffd43b" stroke="#fff3a0" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+
+function umbrellaSVG() {
+    return '<svg viewBox="0 0 160 170" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M80 84 V132 q0 16 -15 16 q-13 0 -13 -13" stroke="#7a5238" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+        '<path d="M10 84 A70 70 0 0 1 150 84 Q133 70 115 84 Q98 70 80 84 Q62 70 45 84 Q27 70 10 84 Z" fill="#ff6b8b"/>' +
+        '<path d="M80 14 Q45 30 45 84 Q62 70 80 84 Z" fill="#ff8fa8"/>' +
+        '<path d="M80 14 Q115 30 115 84 Q98 70 80 84 Z" fill="#ff8fa8"/>' +
+        '<circle cx="80" cy="12" r="5" fill="#7a5238"/>' +
+        '<g transform="translate(80 56)"><ellipse class="eye" cx="-14" cy="0" rx="4" ry="5.5" fill="#3b2f2f"/><ellipse class="eye" cx="14" cy="0" rx="4" ry="5.5" fill="#3b2f2f"/>' +
+        '<circle cx="-23" cy="9" r="5" fill="#fff" opacity="0.5"/><circle cx="23" cy="9" r="5" fill="#fff" opacity="0.5"/>' +
+        '<path d="M-7 8 Q0 16 7 8" stroke="#3b2f2f" stroke-width="2.6" fill="none" stroke-linecap="round"/></g></svg>';
+}
+
+function plainCloudSVG() {
+    return '<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#fff">' +
+        '<circle cx="70" cy="90" r="32"/><circle cx="106" cy="64" r="42"/><circle cx="142" cy="90" r="30"/>' +
+        '<rect x="40" y="84" width="130" height="38" rx="19"/></g></svg>';
+}
+
+// Will it rain? Looks at the current condition and the next 12 hours.
+function rainInfo() {
+    const c = state.data.current, h = state.data.hourly;
+    const code = c.weather_code;
+    const rainingNow = (code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95;
+    const nowKey = c.time.slice(0, 13);
+    const start = Math.max(0, h.time.findIndex(t => t.slice(0, 13) === nowKey));
+    let chance = 0;
+    for (let i = start; i < Math.min(start + 12, h.time.length); i++) {
+        chance = Math.max(chance, h.precipitation_probability[i] ?? 0);
+    }
+    return { rainingNow, chance };
+}
+
+function renderFx() {
+    const fx = $("fx");
+    fx.textContent = "";
+    const c = state.data.current;
+    const theme = themeFor(c.weather_code, c.is_day === 1);
+    const { rainingNow, chance } = rainInfo();
+    const rainy = rainingNow || chance >= 50;
+    const small = window.innerWidth < 600;
+    const rnd = (a, b) => a + Math.random() * (b - a);
+
+    const add = (cls, style, html) => {
+        const d = document.createElement("div");
+        d.className = cls;
+        Object.assign(d.style, style);
+        if (html) d.innerHTML = html;
+        fx.appendChild(d);
+    };
+
+    if (theme === "clear") add("fx-glow", {});
+
+    const cloudCount = { clear: 2, cloudy: 5, fog: 4, rain: 4, storm: 5, night: 1, snow: 3 }[theme] || 2;
+    for (let i = 0; i < cloudCount; i++) {
+        const w = rnd(140, 260);
+        add("fx-cloud", {
+            top: rnd(2, 55) + "vh", width: w + "px",
+            animationDuration: rnd(60, 110) + "s", animationDelay: "-" + rnd(0, 90) + "s"
+        }, plainCloudSVG());
+    }
+
+    if (rainy) {
+        let count = rainingNow ? (theme === "storm" ? 110 : 80) : 30;
+        if (small) count = Math.round(count / 2);
+        for (let i = 0; i < count; i++) {
+            add("fx-drop", {
+                left: rnd(0, 115) + "vw", opacity: rnd(0.4, 0.9),
+                animationDuration: rnd(0.7, 1.3) + "s", animationDelay: "-" + rnd(0, 2) + "s"
+            });
+        }
+    }
+
+    if (theme === "snow") {
+        const count = small ? 30 : 60;
+        for (let i = 0; i < count; i++) {
+            const size = rnd(4, 9);
+            add("fx-flake", {
+                left: rnd(0, 100) + "vw", width: size + "px", height: size + "px", opacity: rnd(0.6, 1),
+                animationDuration: rnd(7, 14) + "s", animationDelay: "-" + rnd(0, 14) + "s"
+            });
+        }
+    }
+
+    if (theme === "night" || (!c.is_day && !rainy && theme !== "snow")) {
+        const count = small ? 25 : 45;
+        for (let i = 0; i < count; i++) {
+            add("fx-star", {
+                left: rnd(0, 100) + "vw", top: rnd(0, 65) + "vh",
+                animationDelay: "-" + rnd(0, 3) + "s", animationDuration: rnd(1.8, 3.4) + "s"
+            });
+        }
+    }
+
+    if (theme === "storm") add("fx-flash", {});
+}
+
+// A friendly tip with an animated helper: umbrella for rain, scarf for snow, sunglasses for strong sun.
+function renderBuddy() {
+    const c = state.data.current;
+    const theme = themeFor(c.weather_code, c.is_day === 1);
+    const { rainingNow, chance } = rainInfo();
+    const uv = state.data.daily.uv_index_max[0] || 0;
+    const box = $("buddy"), art = $("buddyArt"), text = $("buddyText");
+    let tip = null;
+
+    if (rainingNow) {
+        tip = { art: umbrellaSVG(), text: "It's raining right now. Don't forget your umbrella! ☔" };
+    } else if (chance >= 50) {
+        tip = { art: umbrellaSVG(), text: "Rain is likely (" + chance + "% in the next 12 hours). Take an umbrella with you! ☔" };
+    } else if (theme === "snow") {
+        tip = { art: "🧣", text: "Cold and snowy outside. Wrap up warm!" };
+    } else if (theme === "clear" && uv >= 6) {
+        tip = { art: "😎", text: "Very sunny today (UV " + uv.toFixed(1) + "). Sunglasses and sunscreen are a good idea!" };
+    }
+
+    if (!tip) { box.hidden = true; return; }
+    art.innerHTML = tip.art;          // static markup only
+    text.textContent = tip.text;
+    box.hidden = false;
+    box.style.animation = "none";
+    void box.offsetWidth;             // restart the pop-in animation
+    box.style.animation = "";
 }
 
 // ---------- hourly chart (SVG, interactive) ----------
