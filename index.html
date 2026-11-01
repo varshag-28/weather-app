@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast – Interactive Weather</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="clear">
+
+<div class="page">
+
+    <header class="top">
+        <div class="logo">🌤️ <span>SkyCast</span></div>
+
+        <div class="search">
+            <input id="searchInput" type="text" placeholder="Search a city, e.g. Chennai" autocomplete="off"
+                   aria-label="Search for a city" aria-autocomplete="list" aria-controls="suggestions">
+            <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
+
+        <div class="actions">
+            <button id="locateBtn" class="pill" type="button" title="Use my current location">📍 My location</button>
+            <div class="unit-toggle" role="group" aria-label="Temperature unit">
+                <button id="unitC" class="unit active" type="button" aria-pressed="true">°C</button>
+                <button id="unitF" class="unit" type="button" aria-pressed="false">°F</button>
+            </div>
+        </div>
+    </header>
+
+    <div id="recents" class="recents" aria-label="Recent searches"></div>
+    <div id="message" class="message" role="status" hidden></div>
+
+    <main id="content" class="content" aria-busy="true">
+
+        <section class="card hero" id="hero">
+            <p class="place" id="placeName">Loading…</p>
+            <p class="local-time" id="localTime"></p>
+            <div class="hero-main">
+                <div class="hero-icon" id="heroIcon" aria-hidden="true">⏳</div>
+                <div>
+                    <div class="hero-temp"><span id="heroTemp">--</span><span id="heroUnit">°</span></div>
+                    <div class="hero-desc" id="heroDesc"></div>
+                    <div class="hero-feels" id="heroFeels"></div>
+                </div>
+            </div>
+            <div class="hero-range" id="heroRange"></div>
+        </section>
+
+        <section class="card details" aria-label="Current conditions">
+            <div class="detail"><span class="d-icon">💧</span><span class="d-label">Humidity</span><strong id="dHumidity">--</strong></div>
+            <div class="detail"><span class="d-icon">💨</span><span class="d-label">Wind</span><strong id="dWind">--</strong></div>
+            <div class="detail"><span class="d-icon">🌧️</span><span class="d-label">Rain chance today</span><strong id="dRain">--</strong></div>
+            <div class="detail"><span class="d-icon">🕶️</span><span class="d-label">UV index (max)</span><strong id="dUv">--</strong></div>
+            <div class="detail"><span class="d-icon">🌅</span><span class="d-label">Sunrise</span><strong id="dSunrise">--</strong></div>
+            <div class="detail"><span class="d-icon">🌇</span><span class="d-label">Sunset</span><strong id="dSunset">--</strong></div>
+            <div class="detail"><span class="d-icon">🧭</span><span class="d-label">Pressure</span><strong id="dPressure">--</strong></div>
+            <div class="detail"><span class="d-icon">☔</span><span class="d-label">Precipitation now</span><strong id="dPrecip">--</strong></div>
+        </section>
+
+        <section class="card chart-card" aria-label="Hourly forecast">
+            <div class="chart-head">
+                <h2 id="chartTitle">Next 24 hours</h2>
+                <button id="resetDay" class="pill small" type="button" hidden>Back to next 24 hours</button>
+            </div>
+            <p class="hint">Hover or touch the chart to see each hour. Bars show the chance of rain.</p>
+            <div class="chart-wrap" id="chartWrap">
+                <svg id="chart" viewBox="0 0 800 300" role="img" aria-label="Hourly temperature chart"></svg>
+                <div id="tooltip" class="tooltip" hidden></div>
+            </div>
+        </section>
+
+        <section class="card" aria-label="7-day forecast">
+            <h2>7-day forecast</h2>
+            <p class="hint">Tap a day to see its hourly chart.</p>
+            <div class="daily" id="daily"></div>
+        </section>
+
+    </main>
+
+    <footer class="foot">
+        Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · Built by Varsha G
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
