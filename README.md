@@ -4,9 +4,12 @@ A responsive weather website where you can search any city and explore its curre
 
 Built with plain **HTML, CSS and JavaScript** and the free [Open-Meteo](https://open-meteo.com/) API. It needs no backend and no API key.
 
-<!-- Add a screenshot here, e.g. ![SkyCast screenshot](screenshot.png) -->
+<img width="1518" height="725" alt="image" src="https://github.com/user-attachments/assets/7f24fd64-f1f6-4c7f-919e-6313b73040c4" />
+<img width="1510" height="728" alt="image" src="https://github.com/user-attachments/assets/205cb7fc-2115-4bac-a262-4bcc5755fcb4" />
 
-**Live demo:** _add your GitHub Pages link here after you publish it_
+
+
+**Live demo:**https://varshag-28.github.io/weather-app/
 
 ## Features
 
